@@ -8,6 +8,6 @@
     <fragment
         android:id="@+id/citiesFragment"
         android:name="com.example.citiesoftheworld.view.city.CitiesFragment"
-        android:label="fragment_cities"
+        android:label="@string/app_name"
         tools:layout="@layout/fragment_cities" />
 </navigation>

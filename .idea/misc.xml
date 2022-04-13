@@ -3,7 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.16770833333333332" />
+        <entry key="app/src/main/res/font/opensans_font.xml" value="0.165625" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_cities.xml" value="0.18177083333333333" />
       </map>
     </option>
