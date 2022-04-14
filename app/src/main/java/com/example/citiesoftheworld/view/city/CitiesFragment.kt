@@ -1,8 +1,12 @@
 package com.example.citiesoftheworld.view.city
 
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.*
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,7 +20,6 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.fragment_cities.*
@@ -52,73 +55,6 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
         "PERTH" to LatLng(-31.952854, 115.857342),
         "ALICE_SPRINGS" to LatLng(-24.6980, 133.8807)
     )
-
-    private val random = Random()
-
-    /** Demonstrates customizing the info window and/or its contents.  */
-    /*internal inner class CustomInfoWindowAdapter : GoogleMap.InfoWindowAdapter {
-
-        // These are both view groups containing an ImageView with id "badge" and two
-        // TextViews with id "title" and "snippet".
-        private val window: View = layoutInflater.inflate(R.layout.custom_info_window, null)
-        private val contents: View = layoutInflater.inflate(R.layout.custom_info_contents, null)
-
-        override fun getInfoWindow(marker: Marker): View? {
-            if (options.checkedRadioButtonId != R.id.custom_info_window) {
-                // This means that getInfoContents will be called.
-                return null
-            }
-            render(marker, window)
-            return window
-        }
-
-        override fun getInfoContents(marker: Marker): View? {
-            if (options.checkedRadioButtonId != R.id.custom_info_contents) {
-                // This means that the default info contents will be used.
-                return null
-            }
-            render(marker, contents)
-            return contents
-        }
-
-        private fun render(marker: Marker, view: View) {
-            val badge = when (marker.title!!) {
-                "Brisbane" -> R.drawable.badge_qld
-                "Adelaide" -> R.drawable.badge_sa
-                "Sydney" -> R.drawable.badge_nsw
-                "Melbourne" -> R.drawable.badge_victoria
-                "Perth" -> R.drawable.badge_wa
-                in "Darwin Marker 1".."Darwin Marker 4" -> R.drawable.badge_nt
-                else -> 0 // Passing 0 to setImageResource will clear the image view.
-            }
-
-            view.findViewById<ImageView>(R.id.badge).setImageResource(badge)
-
-            // Set the title and snippet for the custom info window
-            val title: String? = marker.title
-            val titleUi = view.findViewById<TextView>(R.id.title)
-
-            if (title != null) {
-                // Spannable string allows us to edit the formatting of the text.
-                titleUi.text = SpannableString(title).apply {
-                    setSpan(ForegroundColorSpan(Color.RED), 0, length, 0)
-                }
-            } else {
-                titleUi.text = ""
-            }
-
-            val snippet: String? = marker.snippet
-            val snippetUi = view.findViewById<TextView>(R.id.snippet)
-            if (snippet != null && snippet.length > 12) {
-                snippetUi.text = SpannableString(snippet).apply {
-                    setSpan(ForegroundColorSpan(Color.MAGENTA), 0, 10, 0)
-                    setSpan(ForegroundColorSpan(Color.BLUE), 12, snippet.length, 0)
-                }
-            } else {
-                snippetUi.text = ""
-            }
-        }
-    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -159,6 +95,37 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
             SearchView(
                 it
             )
+        }
+
+        if(searchView != null){
+            val searchIcon: ImageView =
+                searchView.findViewById(androidx.appcompat.R.id.search_mag_icon)
+
+            val searchCloseIcon: ImageView =
+                searchView.findViewById(androidx.appcompat.R.id.search_close_btn)
+
+            val searchGoBtn: ImageView =
+                searchView.findViewById(androidx.appcompat.R.id.search_go_btn)
+
+            val searchTextView: TextView =
+                searchView.findViewById(androidx.appcompat.R.id.search_src_text)
+
+            searchCloseIcon.setColorFilter(
+                ContextCompat.getColor(context as MainActivity, R.color.white),
+                PorterDuff.Mode.SRC_IN
+            )
+
+            searchIcon.setColorFilter(
+                ContextCompat.getColor(context as MainActivity, R.color.white),
+                PorterDuff.Mode.SRC_IN
+            )
+
+            searchGoBtn.setColorFilter(
+                ContextCompat.getColor(context as MainActivity, R.color.white),
+                PorterDuff.Mode.SRC_IN
+            )
+
+            searchTextView.setTextColor(ContextCompat.getColor(context as MainActivity, R.color.white))
         }
 
         menu.findItem(R.id.menu_search).apply {
@@ -260,7 +227,6 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
     }
 
     private fun setUpMapMarkers(cities: MutableList<CityAndCountry>){
-        Timber.tag("MARKERSIZE").d("size is ${cities.size}")
         googleMapObject.clear()
         for(cityAndCountry in cities){
 
@@ -274,7 +240,6 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
                         .position(latLng)
                         .title(cityAndCountry.city.name)
                         .snippet(cityAndCountry.city.localName)
-                        //                    .icon(icon)
                         .infoWindowAnchor(0.5f, 0.5f)
                         .draggable(false)
                         .zIndex(0F)
@@ -282,100 +247,11 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
                     googleMapObject.addMarker(
                         markerOptions
                     )
+                    googleMapObject.moveCamera(CameraUpdateFactory.newLatLng(markerOptions.position))
                 }
         }
     }
 
-    /**
-     * Show all the specified markers on the map
-     */
-   /*
-
-    private fun addMarkersToMap() {
-
-        val placeDetailsMap = mutableMapOf(
-            // Uses a coloured icon
-            "BRISBANE" to PlaceDetails(
-                position = places.getValue("BRISBANE"),
-                title = "Brisbane",
-                snippet = "Population: 2,074,200",
-                icon = BitmapDescriptorFactory
-                    .defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
-            ),
-
-            // Uses a custom icon with the info window popping out of the center of the icon.
-            "SYDNEY" to PlaceDetails(
-                position = places.getValue("SYDNEY"),
-                title = "Sydney",
-                snippet = "Population: 4,627,300",
-//                icon = BitmapDescriptorFactory.fromResource(R.drawable.arrow),
-                infoWindowAnchorX = 0.5f,
-                infoWindowAnchorY = 0.5f
-            ),
-
-            // Will create a draggable marker. Long press to drag.
-            "MELBOURNE" to PlaceDetails(
-                position = places.getValue("MELBOURNE"),
-                title = "Melbourne",
-                snippet = "Population: 4,137,400",
-                draggable = true
-            ),
-
-            // Use a vector drawable resource as a marker icon.
-            "ALICE_SPRINGS" to PlaceDetails(
-                position = places.getValue("ALICE_SPRINGS"),
-                title = "Alice Springs",
-//                icon = vectorToBitmap(
-//                    R.drawable.ic_android, Color.parseColor("#A4C639"))
-            ),
-
-            // More markers for good measure
-            "PERTH" to PlaceDetails(
-                position = places.getValue("PERTH"),
-                title = "Perth",
-                snippet = "Population: 1,738,800"
-            ),
-
-            "ADELAIDE" to PlaceDetails(
-                position = places.getValue("ADELAIDE"),
-                title = "Adelaide",
-                snippet = "Population: 1,213,000"
-            )
-
-        )
-
-        // add 4 markers on top of each other in Darwin with varying z-indexes
-        (0 until 4).map {
-            placeDetailsMap.put(
-                "DARWIN ${it + 1}", PlaceDetails(
-                    position = places.getValue("DARWIN"),
-                    title = "Darwin Marker ${it + 1}",
-                    snippet = "z-index initially ${it + 1}",
-                    zIndex = it.toFloat()
-                )
-            )
-        }
-
-        // place markers for each of the defined locations
-        placeDetailsMap.keys.map {
-            with(placeDetailsMap.getValue(it)) {
-                googleMapObject.addMarker(
-                    MarkerOptions()
-                        .position(position)
-                        .title(title)
-                        .snippet(snippet)
-                        .icon(icon)
-                        .infoWindowAnchor(infoWindowAnchorX, infoWindowAnchorY)
-                        .draggable(draggable)
-                        .zIndex(zIndex))
-
-            }
-        }
-
-
-    }
-
-    */
 
     override fun onMarkerClick(p0: Marker): Boolean {
         return false
@@ -409,26 +285,13 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
         // return early if the map was not initialised properly
         googleMapObject = googleMap ?: return
 
-        // create bounds that encompass every location we reference
-        val boundsBuilder = LatLngBounds.Builder()
-        // include all places we have markers for on the map
-        places.keys.map { place -> boundsBuilder.include(places.getValue(place)) }
-        val bounds = boundsBuilder.build()
-
         with(googleMapObject) {
             // Hide the zoom controls as the button panel will cover it.
             uiSettings.isZoomControlsEnabled = false
 
-            // Override the default content description on the view, for accessibility mode.
-            // Ideally this string would be localised.
-            setContentDescription("Map with lots of markers.")
-
-//            moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50))
-//            moveCamera(CameraUpdateFactory.newLatLngBounds(bounds,100,100,50))
-            moveCamera(CameraUpdateFactory.newLatLng(LatLng(-27.47093, 153.0235)))
+            moveCamera(CameraUpdateFactory.newLatLng(citiesViewModel.defaultLatLng))
         }
 
-        // Add lots of markers to the googleMap.
-//        addMarkersToMap()
+
     }
 }

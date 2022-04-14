@@ -6,6 +6,7 @@ import com.example.citiesoftheworld.database.model.cityAndCountry.CityAndCountry
 import com.example.citiesoftheworld.network.model.Items
 import com.example.citiesoftheworld.network.model.WorldCitiesApiParams
 import com.example.citiesoftheworld.network.model.WorldCitiesResultState
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
@@ -22,11 +23,7 @@ class CitiesViewModel(
 
     var worldCitiesApiParams = WorldCitiesApiParams(nameFilter = "", page = 1)
 
-//    private val _searchEvent = MutableLiveData<Unit>()
-//    val observeSearchEvent: LiveData<Unit>
-//        get() = _searchEvent
-
-    private val mapView = MutableLiveData<Boolean>()
+    var defaultLatLng = LatLng(-27.47093, 153.0235)
 
     var searchByLiveData: LiveData<MutableList<CityAndCountry>>
     private val filterLiveData = MutableLiveData<String>()
@@ -74,13 +71,5 @@ class CitiesViewModel(
         worldCitiesApiParams.nameFilter = filter
         getWorldCitiesResultMutableLiveData.postValue(worldCitiesApiParams)
     }
-
-    fun showMapView(show: Boolean){
-        mapView.value = show
-    }
-
-//    fun triggerSearchEvent() {
-//        _searchEvent.postValue(Unit)
-//    }
 
 }
