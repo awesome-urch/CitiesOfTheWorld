@@ -11,6 +11,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+
 class CitiesViewModel(
     private val cityRepository: CityRepository,
 ) : ViewModel() {
@@ -21,8 +22,31 @@ class CitiesViewModel(
 
     var worldCitiesApiParams = WorldCitiesApiParams(nameFilter = "", page = 1)
 
-    fun setWorldCitiesApiParams(nameFilter: String){
-        worldCitiesApiParams.nameFilter = nameFilter
+//    private val _searchEvent = MutableLiveData<Unit>()
+//    val observeSearchEvent: LiveData<Unit>
+//        get() = _searchEvent
+
+
+
+    var searchByLiveData: LiveData<MutableList<CityAndCountry>>
+    private val filterLiveData = MutableLiveData<String>()
+
+    fun setFilter(filter: String) {
+        filterLiveData.value = filter
+        worldCitiesApiParams.nameFilter = filter
+        getWorldCitiesResultMutableLiveData.postValue(worldCitiesApiParams)
+    }
+
+    init {
+
+        searchByLiveData = Transformations.switchMap(
+            filterLiveData
+        ) { name: String? ->
+            cityRepository.getCitiesByNameLiveData(
+                name
+            )
+        }
+
     }
 
     val getWorldCitiesResultMutableLiveData = MutableLiveData<WorldCitiesApiParams>()
@@ -51,36 +75,8 @@ class CitiesViewModel(
         cityRepository.saveCloseShowrooms(itemList)
     }
 
-    fun getCitiesLiveData(): LiveData<MutableList<CityAndCountry>> {
-        return cityRepository.getCitiesLiveData()
-    }
-
-    fun getCitiesByNameLiveData(name: String?): LiveData<MutableList<CityAndCountry>> {
-        return cityRepository.getCitiesByNameLiveData(name)
-    }
-
-//    private val _users = MutableLiveData<Resource<List<User>>>()
-//    val users: LiveData<Resource<List<User>>>
-//        get() = _users
-//
-//    init {
-//        fetchUsers()
+//    fun triggerSearchEvent() {
+//        _searchEvent.postValue(Unit)
 //    }
 
-//    private fun fetchUsers() {
-//
-//        viewModelScope.launch {
-//
-//            mainRepository.getAllUsers()
-//
-//            _users.postValue(Resource.loading(null))
-//            if (networkHelper.isNetworkConnected()) {
-//                mainRepository.getUsers().let {
-//                    if (it.isSuccessful) {
-//                        _users.postValue(Resource.success(it.body()))
-//                    } else _users.postValue(Resource.error(it.errorBody().toString(), null))
-//                }
-//            } else _users.postValue(Resource.error("No internet connection", null))
-//        }
-//    }
 }

@@ -9,9 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.citiesoftheworld.R
 import com.example.citiesoftheworld.database.model.cityAndCountry.CityAndCountry
-
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import timber.log.Timber
 
 @ExperimentalStdlibApi
 @ExperimentalCoroutinesApi

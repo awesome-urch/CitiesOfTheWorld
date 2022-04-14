@@ -10,6 +10,9 @@ interface CityDao {
     @Query("SELECT * FROM city ")
     fun getCitiesLiveData(): LiveData<MutableList<CityAndCountry>>
 
+//    @Query("SELECT * FROM city WHERE name LIKE :name OR local_name LIKE :name ")
+//    fun getCitiesByNameLiveData(name: String?): LiveData<MutableList<CityAndCountry>>
+
     @Query("SELECT * FROM city WHERE name LIKE :name OR local_name LIKE :name ")
     fun getCitiesByNameLiveData(name: String?): LiveData<MutableList<CityAndCountry>>
 

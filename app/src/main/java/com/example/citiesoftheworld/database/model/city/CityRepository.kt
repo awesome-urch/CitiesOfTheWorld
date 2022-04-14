@@ -36,7 +36,22 @@ class CityRepository (
     }
 
     fun getCitiesByNameLiveData(name: String?): LiveData<MutableList<CityAndCountry>> {
-        return cityDao.getCitiesByNameLiveData(name)
+//        return cityDao.getCitiesByNameLiveData(name)
+//        val name1 = ""
+
+        val search = "%$name%"
+//        val search = "%ni%"
+        Timber.tag("SEARCHTRIGGER").d("filter 2 $name")
+//        var x = cityDao.getCitiesByNameLiveData(search)
+//
+//        Timber.tag("SEARCHTRIGGER").d("first is ${x.value?.get(0)?.city}")
+//
+//        if(x.value?.isNotEmpty() == true){
+//            Timber.tag("SEARCHTRIGGER").d("first is ${x.value?.get(0)?.city}")
+//        }
+
+
+        return cityDao.getCitiesByNameLiveData(search)
     }
 
     @FlowPreview
@@ -48,8 +63,6 @@ class CityRepository (
     private suspend fun requestWorldCities(worldCitiesApiParams: WorldCitiesApiParams): Boolean {
         isRequestInProgress = true
         val successful = false
-
-        Timber.tag("DEBUG_HF").d("last page $lastRequestedPage")
 
         try {
 
@@ -63,9 +76,6 @@ class CityRepository (
                 response.body()?.let { worldCities ->
                     withContext(Dispatchers.IO) {
 
-                        Timber.tag("TIMEBUWO").d("$worldCities")
-
-//                        worldCityUiStateResult.offer(WorldCityUiState.Success)
                         val data = worldCities.data
                         if(data != null){
                             val items = data.items
@@ -78,23 +88,18 @@ class CityRepository (
                             worldCitiesResult.value = WorldCitiesResultState.Error("")
                         }
 
-                        Timber.d("data is $worldCities")
-
                     }
                 }
             }else{
-//                worldCityUiStateResult.offer(WorldCityUiState.Error(""))
                 worldCitiesResult.value = WorldCitiesResultState.Error("")
 
             }
 
         }catch (exception: IOException) {
-            Timber.tag("DEBUG_HF").d("exception $exception")
 
             worldCitiesResult.value = WorldCitiesResultState.Error("$exception")
 
         } catch (exception: HttpException) {
-            Timber.tag("DEBUG_HF").d("exception $exception")
 
             worldCitiesResult.value = WorldCitiesResultState.Error("")
 
@@ -114,8 +119,6 @@ class CityRepository (
     fun saveCloseShowrooms(itemList: List<Items>){
         CoroutineScope(Dispatchers.IO).launch {
             for(city in itemList){
-
-                Timber.tag("DEBUG_HF").d("city is $city")
 
                 Timber.d("${city.id} has ${city.name}km")
 
