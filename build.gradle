@@ -2,9 +2,11 @@
 buildscript {
     ext.navigationVersion = '2.4.2'
     ext.kotlinSerialization = '1.4.21'
+    ext.mapsPlatform = '2.0.1'
     dependencies {
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
         classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlinSerialization"
+        classpath "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:$mapsPlatform"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }

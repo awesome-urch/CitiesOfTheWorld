@@ -26,16 +26,10 @@ class CitiesViewModel(
 //    val observeSearchEvent: LiveData<Unit>
 //        get() = _searchEvent
 
-
+    private val mapView = MutableLiveData<Boolean>()
 
     var searchByLiveData: LiveData<MutableList<CityAndCountry>>
     private val filterLiveData = MutableLiveData<String>()
-
-    fun setFilter(filter: String) {
-        filterLiveData.value = filter
-        worldCitiesApiParams.nameFilter = filter
-        getWorldCitiesResultMutableLiveData.postValue(worldCitiesApiParams)
-    }
 
     init {
 
@@ -73,6 +67,16 @@ class CitiesViewModel(
 
     fun saveCloseShowrooms(itemList: List<Items>){
         cityRepository.saveCloseShowrooms(itemList)
+    }
+
+    fun setFilter(filter: String) {
+        filterLiveData.value = filter
+        worldCitiesApiParams.nameFilter = filter
+        getWorldCitiesResultMutableLiveData.postValue(worldCitiesApiParams)
+    }
+
+    fun showMapView(show: Boolean){
+        mapView.value = show
     }
 
 //    fun triggerSearchEvent() {

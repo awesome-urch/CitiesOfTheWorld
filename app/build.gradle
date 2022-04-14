@@ -6,6 +6,7 @@ plugins {
     id 'androidx.navigation.safeargs.kotlin'
     id 'kotlinx-serialization'
     id 'kotlin-android-extensions'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
 
 
@@ -79,36 +80,29 @@ dependencies {
     implementation "io.insert-koin:koin-android-viewmodel:$koinVersion"
     implementation "io.insert-koin:koin-android:$koinVersion"
 
-//    api "io.insert-koin:koin-core:$koin_version"
+    //map
+    implementation 'com.google.android.gms:play-services-maps:18.0.2'
+
 
     // Networking
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
 
-    //moshi
-
+    //GSON
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
-
-    /*implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
-    implementation "com.squareup.moshi:moshi-kotlin:$moshiVersion"
-    //annotationProcessor "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
-    kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"*/
-//    kapt "com.squareup.moshi:moshi-kotlin-codegen:1.12.0"
-
-    //Moshi
-//    def moshi_version = "1.12.0"
-//    kapt("com.squareup.moshi:moshi-kotlin-codegen:1.12.0")
-//    kapt "com.squareup.moshi:moshi-kotlin-codegen:1.9.2"
-//    implementation "com.squareup.moshi:moshi:1.12.0"
-//    implementation "com.squareup.moshi:moshi-adapters:1.12.0"
-//    implementation "com.squareup.moshi:moshi-kotlin:1.12.0"
-
-
 
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinSerializationVersion"
 
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidXTestExtKotlinRunnerVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+}
+
+secrets {
+    defaultPropertiesFileName 'local.properties'
+    // To add your Maps API key to this project:
+    // 1. Open the root project's local.properties file
+    // 2. Add this line, where YOUR_API_KEY is your API key:
+    //        MAPS_API_KEY=YOUR_API_KEY
 }
