@@ -5,4 +5,6 @@
     <string name="menu_search">Search</string>
     <string name="name">Name</string>
     <string name="local_name">Local name</string>
+    <string name="no_city_found">No city found</string>
+    <string name="country">Country</string>
 </resources>

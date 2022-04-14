@@ -20,14 +20,14 @@ class CitiesAdapter : ListAdapter<CityAndCountry, RecyclerView.ViewHolder>(USER_
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val cityName: TextView = itemView.findViewById(R.id.cityName)
         private val cityLocalName: TextView = itemView.findViewById(R.id.cityLocalName)
+        private val countryName: TextView = itemView.findViewById(R.id.countryName)
 
         @ExperimentalStdlibApi
         fun bind(cityAndCountry: CityAndCountry){
 
-            Timber.d("info: $cityAndCountry")
-
             cityName.text = cityAndCountry.city.name
             cityLocalName.text = cityAndCountry.city.localName
+            countryName.text = cityAndCountry.country?.name
 
         }
 

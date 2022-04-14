@@ -3,6 +3,8 @@ package com.example.citiesoftheworld.view.city
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.citiesoftheworld.R
@@ -62,6 +64,9 @@ class CitiesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // add dividers between RecyclerView's row items
+        val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+        citiesRecyclerView.addItemDecoration(decoration)
         setupScrollListener()
         setUpAdapter()
 
@@ -93,31 +98,17 @@ class CitiesFragment : Fragment() {
         citiesAdapter = CitiesAdapter()
         citiesRecyclerView.adapter = citiesAdapter
 
-//        profileViewModel.getUserContactsLiveData().observe(viewLifecycleOwner, Observer {
-//            Timber.d("list are: $it")
-//
-//            if(it.isEmpty()){
-//
-//                if(!profileViewModel.isCheckingContacts){
-//                    emptyStateLayout.visibility = View.VISIBLE
-//                    emptyStateButton.visibility = View.VISIBLE
-//                    emptyStateButton.text = getString(R.string.invite_friends)
-//                    emptyStateMessage.text = String.format(" ${getString(R.string.none_of_your_contact_is_on_myshowroom)}")
-//                }
-//
-//            }else{
-//                emptyStateLayout.visibility = View.GONE
-//                userAdapter.submitList(it)
-//            }
-//
-//            var userText = getString(R.string.contacts_lowercase)
-//            if(it.size == 1) {
-//                userText = getString(R.string.contact_lowercase)
-//            }
-//
-//            contactsToolbar.title = getString(R.string.select_contact)
-//            contactsToolbar.subtitle = "${MyShowroomAppUtils.coolNumberFormat(it.size.toLong())} $userText"
-//        })
+        citiesViewModel.getCitiesLiveData().observe(viewLifecycleOwner) {
+
+            if (it.isNotEmpty()) {
+                Timber.d("first is: ${it[0]}")
+                emptyState.visibility = View.GONE
+                citiesAdapter.submitList(it)
+            } else {
+                emptyState.visibility = View.VISIBLE
+            }
+
+        }
     }
 
     private fun setupScrollListener() {

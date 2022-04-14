@@ -1,5 +1,7 @@
 package com.example.citiesoftheworld.database.model.city
 
+import androidx.lifecycle.LiveData
+import com.example.citiesoftheworld.database.model.cityAndCountry.CityAndCountry
 import com.example.citiesoftheworld.database.model.country.Country
 import com.example.citiesoftheworld.database.model.country.CountryDao
 import com.example.citiesoftheworld.network.ApiHelper
@@ -20,13 +22,6 @@ class CityRepository (
     private val countryDao: CountryDao
     ) {
 
-//    lateinit var list:Response<List<User>>
-//    lateinit var listdata:ArrayList<User>
-
-//    suspend fun getUsers() =  apiHelper.getUsers()
-
-//    @OptIn(ObsoleteCoroutinesApi::class)
-//    private val worldCityUiStateResult = ConflatedBroadcastChannel<WorldCityUiState>()
     private val worldCitiesResult = MutableStateFlow<WorldCitiesResultState>(WorldCitiesResultState.Empty)
     private val worldCitiesResultState: StateFlow<WorldCitiesResultState> = worldCitiesResult
 
@@ -36,6 +31,13 @@ class CityRepository (
     // avoid triggering multiple requests in the same time
     private var isRequestInProgress = false
 
+    fun getCitiesLiveData(): LiveData<MutableList<CityAndCountry>> {
+        return cityDao.getCitiesLiveData()
+    }
+
+    fun getCitiesByNameLiveData(name: String?): LiveData<MutableList<CityAndCountry>> {
+        return cityDao.getCitiesByNameLiveData(name)
+    }
 
     @FlowPreview
     suspend fun getWorldCitiesStream(worldCitiesApiParams: WorldCitiesApiParams): Flow<WorldCitiesResultState> {
@@ -153,41 +155,6 @@ class CityRepository (
     }
 
 
-//    suspend fun getAllUsers() { //: Response<List<User>>
-//        val responseGet = apiHelper.getUsers()
-//        try {
-//            if (responseGet.isSuccessful) {
-//                responseGet.body()?.let { userList ->
-//                    withContext(Dispatchers.IO) {
-//
-//                        Log.d("MAINREPO",userList.toString())
-//
-//                        for(user in userList){
-//                            userDao.addUser(
-//                                UserModel(
-//                                    0,
-//                                    user.name,
-//                                    user.email,
-//                                    user.avatar
-//                                )
-//                            )
-//                        }
-//
-////                        listdata.addAll(userList)
-//                    }
-//                }
-//            }
-//        } catch (e: NetworkErrorException) {
-//
-//        }
-//
-//    }
 
-//    sealed class WorldCityUiState {
-//        object Success : WorldCityUiState()
-//        data class Error(val message: String) : WorldCityUiState()
-//        object Loading : WorldCityUiState()
-//        object Empty : WorldCityUiState()
-//    }
 
 }

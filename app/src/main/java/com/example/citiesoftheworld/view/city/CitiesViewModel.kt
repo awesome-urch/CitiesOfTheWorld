@@ -2,6 +2,7 @@ package com.example.citiesoftheworld.view.city
 
 import androidx.lifecycle.*
 import com.example.citiesoftheworld.database.model.city.CityRepository
+import com.example.citiesoftheworld.database.model.cityAndCountry.CityAndCountry
 import com.example.citiesoftheworld.network.model.Items
 import com.example.citiesoftheworld.network.model.WorldCitiesApiParams
 import com.example.citiesoftheworld.network.model.WorldCitiesResultState
@@ -48,6 +49,14 @@ class CitiesViewModel(
 
     fun saveCloseShowrooms(itemList: List<Items>){
         cityRepository.saveCloseShowrooms(itemList)
+    }
+
+    fun getCitiesLiveData(): LiveData<MutableList<CityAndCountry>> {
+        return cityRepository.getCitiesLiveData()
+    }
+
+    fun getCitiesByNameLiveData(name: String?): LiveData<MutableList<CityAndCountry>> {
+        return cityRepository.getCitiesByNameLiveData(name)
     }
 
 //    private val _users = MutableLiveData<Resource<List<User>>>()

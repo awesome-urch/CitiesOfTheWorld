@@ -14,8 +14,6 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:maxLines="1"
-        android:ellipsize="end"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -27,14 +25,24 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="10dp"
-        android:maxLines="1"
-        android:ellipsize="end"
+        android:layout_marginBottom="8dp"
         android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/countryName"
         app:layout_constraintStart_toStartOf="@id/cityName"
         app:layout_constraintTop_toBottomOf="@+id/cityName"
+        app:layout_constraintBottom_toBottomOf="parent"
         tools:text="@string/local_name"/>
+
+    <TextView
+        android:id="@+id/countryName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/cityLocalName"
+        tools:text="@string/country"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
