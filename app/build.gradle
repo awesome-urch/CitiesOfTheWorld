@@ -82,7 +82,12 @@ dependencies {
 
     //map
     implementation 'com.google.android.gms:play-services-maps:18.0.2'
+    implementation "com.google.android.gms:play-services-location:$playServicesLocation"
 
+
+    // Below is used to run the easypermissions library to manage location permissions
+    // EasyPermissions is needed to help us request for permission to access location
+    implementation 'pub.devrel:easypermissions:3.0.0'
 
     // Networking
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
