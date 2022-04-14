@@ -2,6 +2,9 @@ package com.example.citiesoftheworld.view.city
 
 import androidx.lifecycle.*
 import com.example.citiesoftheworld.database.model.city.CityRepository
+import com.example.citiesoftheworld.network.model.Items
+import com.example.citiesoftheworld.network.model.WorldCitiesApiParams
+import com.example.citiesoftheworld.network.model.WorldCitiesResultState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
@@ -11,19 +14,41 @@ class CitiesViewModel(
     private val cityRepository: CityRepository,
 ) : ViewModel() {
 
+    companion object {
+        private const val VISIBLE_THRESHOLD = 5
+    }
 
-    val getCloseUserHomeFeedLiveData = MutableLiveData<Unit>()
+    var worldCitiesApiParams = WorldCitiesApiParams(nameFilter = "", page = 1)
+
+    fun setWorldCitiesApiParams(nameFilter: String){
+        worldCitiesApiParams.nameFilter = nameFilter
+    }
+
+    val getWorldCitiesResultMutableLiveData = MutableLiveData<WorldCitiesApiParams>()
     @FlowPreview
-    val getCloseUserHomeFeedResult: LiveData<CityRepository.WorldCityUiState> = getCloseUserHomeFeedLiveData.switchMap {
+    val getWorldCitiesResultLiveData: LiveData<WorldCitiesResultState> = getWorldCitiesResultMutableLiveData.switchMap {
         liveData {
             Timber.d(" getHomeFeedCloseUserStream")
-            val repos = cityRepository.getWorldCitiesStream().asLiveData(
+            val repos = cityRepository.getWorldCitiesStream(it).asLiveData(
                 Dispatchers.Main)
             emitSource(repos)
         }
     }
 
-    val check = "Check it"
+    fun cityListScrolled(visibleItemCount: Int, lastVisibleItemPosition: Int, totalItemCount: Int) {
+        if (visibleItemCount + lastVisibleItemPosition + VISIBLE_THRESHOLD >= totalItemCount) {
+            Timber.d("get extra cities")
+            viewModelScope.launch {
+                Timber.d("request more")
+                cityRepository.requestMore(worldCitiesApiParams)
+//                chattedContactRepository.requestMore()
+            }
+        }
+    }
+
+    fun saveCloseShowrooms(itemList: List<Items>){
+        cityRepository.saveCloseShowrooms(itemList)
+    }
 
 //    private val _users = MutableLiveData<Resource<List<User>>>()
 //    val users: LiveData<Resource<List<User>>>

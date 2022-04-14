@@ -1,15 +1,15 @@
 package com.example.citiesoftheworld.database.model.city
 
-import android.accounts.NetworkErrorException
-import android.util.Log
+import com.example.citiesoftheworld.database.model.country.Country
 import com.example.citiesoftheworld.database.model.country.CountryDao
 import com.example.citiesoftheworld.network.ApiHelper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import com.example.citiesoftheworld.network.model.Items
+import com.example.citiesoftheworld.network.model.WorldCitiesApiParams
+import com.example.citiesoftheworld.network.model.WorldCitiesResultState
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
@@ -26,7 +26,9 @@ class CityRepository (
 //    suspend fun getUsers() =  apiHelper.getUsers()
 
 //    @OptIn(ObsoleteCoroutinesApi::class)
-    private val worldCityUiStateResult = ConflatedBroadcastChannel<WorldCityUiState>()
+//    private val worldCityUiStateResult = ConflatedBroadcastChannel<WorldCityUiState>()
+    private val worldCitiesResult = MutableStateFlow<WorldCitiesResultState>(WorldCitiesResultState.Empty)
+    private val worldCitiesResultState: StateFlow<WorldCitiesResultState> = worldCitiesResult
 
     // keep the last requested page. When the request is successful, increment the page number.
     private var lastRequestedPage = 1
@@ -36,107 +38,120 @@ class CityRepository (
 
 
     @FlowPreview
-    suspend fun getWorldCitiesStream(): Flow<WorldCityUiState> {
-        Timber.d("request in progress getHomeFeedCloseUserStream")
-        requestAndSaveData()
-        return worldCityUiStateResult.asFlow()
+    suspend fun getWorldCitiesStream(worldCitiesApiParams: WorldCitiesApiParams): Flow<WorldCitiesResultState> {
+        requestWorldCities(worldCitiesApiParams)
+        return worldCitiesResultState
     }
 
-
-    private suspend fun requestAndSaveData(): Boolean {
+    private suspend fun requestWorldCities(worldCitiesApiParams: WorldCitiesApiParams): Boolean {
         isRequestInProgress = true
-        var successful = false
+        val successful = false
 
         Timber.tag("DEBUG_HF").d("last page $lastRequestedPage")
 
-
         try {
-//            var batchSize = PAGE_BATCH_SIZE
-//            if(lastRequestedPage == 2) batchSize = FIRST_PAGE_BATCH_SIZE
-//            val response = myShowroomApi.getHomeFeedShowroom(
-//                request = HOME_FEED_SHOWROOM,
-//                lat = userRepository.getOwner().latitude.toString(),
-//                lng = userRepository.getOwner().longitude.toString(),
-//                search = searchBusinessInput.search,
-//                start = (lastRequestedPage - 1).times(batchSize),
-//                viewer = userRepository.getOwner().userRemoteId.toString(),
-//                businessOwner = "0",
-//                key = KEY)
 
-            val response = apiHelper.getWorldCities()
+            Timber.tag("DEBUG_HF").d("params $worldCitiesApiParams")
 
-//            Timber.tag("DEBUG_HF").d("batch size $PAGE_BATCH_SIZE")
+            val response = apiHelper.getWorldCities(
+                worldCitiesApiParams
+            )
 
             if (response.isSuccessful) {
                 response.body()?.let { worldCities ->
                     withContext(Dispatchers.IO) {
 
-                        Timber.tag("TIMEBUWO").d("${worldCities.time}")
+                        Timber.tag("TIMEBUWO").d("$worldCities")
 
-                        worldCityUiStateResult.offer(WorldCityUiState.Success)
+//                        worldCityUiStateResult.offer(WorldCityUiState.Success)
+                        val data = worldCities.data
+                        if(data != null){
+                            val items = data.items
+                            if(items != null){
+                                worldCitiesResult.value = WorldCitiesResultState.Success(items)
+                            }else{
+                                worldCitiesResult.value = WorldCitiesResultState.Error("")
+                            }
+                        }else{
+                            worldCitiesResult.value = WorldCitiesResultState.Error("")
+                        }
 
-                        Timber.d(worldCities.toString())
+                        Timber.d("data is $worldCities")
 
-//                        listdata.addAll(userList)
                     }
                 }
             }else{
-                worldCityUiStateResult.offer(WorldCityUiState.Error(""))
-            }
-            
-            
-//            if(response.error == 0){
-//
-//                val data = response.data as MutableList<HomeFeedShowroomData>
-//
-//                if(lastRequestedPage == 1){
-//                    Timber.tag("DEBUG_HF").d("first page, refresh data")
-//                    if(data.isNotEmpty()){
-//                        closeBusinessesHomeFeedDao.deleteAll()
-//                    }
-////                    requestBusinessOwnerShowroom()
-////                    var userShowroomList = getBusinessOwnerShowroom()
-//                    data.addAll(getBusinessOwnerShowroom())
-//                }
-//
-//                Timber.tag("DEBUG_HF").d("data is $data")
-//
-////                if(lastRequestedPage == 1){
-////                    worldCityUiStateResult.offer(HomeFeedCloseUserResult.SuccessfullyFetchedFirstPage)
-////                }
-//                Timber.tag("RFRSH").d("SuccessfullyGotFeedShowroom repo")
-//                worldCityUiStateResult.offer(HomeFeedCloseUserResult.SuccessfullyGotFeedShowroom(data))
-//                successful = true
-//
-//            }else{
-//                Timber.tag("DEBUG_HF").d("error from server is $response")
 //                worldCityUiStateResult.offer(WorldCityUiState.Error(""))
-////                if(lastRequestedPage == 1){
-////                    worldCityUiStateResult.offer(HomeFeedCloseUserResult.ErrorFetchingFirstPage)
-////                }
-//            }
+                worldCitiesResult.value = WorldCitiesResultState.Error("")
+
+            }
 
         }catch (exception: IOException) {
             Timber.tag("DEBUG_HF").d("exception $exception")
-//            worldCityUiStateResult.offer(HomeFeedCloseUserResult.Error(exception))
-            worldCityUiStateResult.offer(WorldCityUiState.Error("$exception"))
-//            if(lastRequestedPage == 1){
-//                Timber.tag("DEBUG_HF").d("ErrorFetchingFirstPage $exception")
-//                worldCityUiStateResult.offer(HomeFeedCloseUserResult.ErrorFetchingFirstPage)
-//            }
+
+            worldCitiesResult.value = WorldCitiesResultState.Error("$exception")
+
         } catch (exception: HttpException) {
             Timber.tag("DEBUG_HF").d("exception $exception")
-//            worldCityUiStateResult.offer(HomeFeedCloseUserResult.Error(exception))
-            worldCityUiStateResult.offer(WorldCityUiState.Error(""))
-//            if(lastRequestedPage == 1){
-//                Timber.tag("DEBUG_HF").d("ErrorFetchingFirstPage $exception")
-//                worldCityUiStateResult.offer(HomeFeedCloseUserResult.ErrorFetchingFirstPage)
-//            }
+
+            worldCitiesResult.value = WorldCitiesResultState.Error("")
+
         }
 
         isRequestInProgress = false
         return successful
     }
+
+    suspend fun requestMore(worldCitiesApiParams: WorldCitiesApiParams) {
+        if (isRequestInProgress) return
+        lastRequestedPage++
+        worldCitiesApiParams.page = lastRequestedPage
+        requestWorldCities(worldCitiesApiParams)
+    }
+
+    fun saveCloseShowrooms(itemList: List<Items>){
+        CoroutineScope(Dispatchers.IO).launch {
+            for(city in itemList){
+
+                Timber.tag("DEBUG_HF").d("city is $city")
+
+                Timber.d("${city.id} has ${city.name}km")
+
+                city.id?.let { cityId ->
+                    City(
+                        id = cityId.toLong(),
+                        name = city.name,
+                        localName = city.local_name,
+                        lat = city.lat,
+                        lng = city.lng,
+                        countryId = city.country_id?.toLong()
+                    )
+                }?.let { cityModel ->
+                    cityDao.insert(
+                        cityModel
+                    )
+                }
+
+                val country = city.country
+
+                if(country != null){
+                    country.id?.let { countryId ->
+                        Country(
+                            id = countryId.toLong(),
+                            name = country.name,
+                            code = country.code,
+                            continentId = country.continent_id
+                        )
+                    }?.let { countryModel ->
+                        countryDao.insert(
+                            countryModel
+                        )
+                    }
+                }
+            }
+        }
+    }
+
 
 //    suspend fun getAllUsers() { //: Response<List<User>>
 //        val responseGet = apiHelper.getUsers()
@@ -168,11 +183,11 @@ class CityRepository (
 //
 //    }
 
-    sealed class WorldCityUiState {
-        object Success : WorldCityUiState()
-        data class Error(val message: String) : WorldCityUiState()
-        object Loading : WorldCityUiState()
-        object Empty : WorldCityUiState()
-    }
+//    sealed class WorldCityUiState {
+//        object Success : WorldCityUiState()
+//        data class Error(val message: String) : WorldCityUiState()
+//        object Loading : WorldCityUiState()
+//        object Empty : WorldCityUiState()
+//    }
 
 }

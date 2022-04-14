@@ -1,31 +1,27 @@
 package com.example.citiesoftheworld.view.city
 
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.citiesoftheworld.R
+import com.example.citiesoftheworld.network.model.WorldCitiesResultState
+import kotlinx.android.synthetic.main.fragment_cities.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import org.koin.android.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [CitiesFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+@FlowPreview
+@ExperimentalCoroutinesApi
+@ExperimentalStdlibApi
 class CitiesFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-//    private var param1: String? = null
-//    private var param2: String? = null
 
     private val citiesViewModel : CitiesViewModel by viewModel()
+
+    private lateinit var citiesAdapter: CitiesAdapter
 
     /*override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,36 +32,107 @@ class CitiesFragment : Fragment() {
         Timber.d("oncreated called")
     }*/
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setHasOptionsMenu(true)
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_cities, container, false)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) =
+        when (item.itemId) {
+            R.id.menu_search -> {
+//                viewModel.clearCompletedTasks()
+                true
+            }
+            else -> false
+        }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.world_cities_menu, menu)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Timber.d("display is : ${citiesViewModel.check}")
+        setupScrollListener()
+        setUpAdapter()
 
-        citiesViewModel.getCloseUserHomeFeedLiveData.postValue(Unit)
+        citiesViewModel.setWorldCitiesApiParams("")
+        citiesViewModel.getWorldCitiesResultMutableLiveData.postValue(citiesViewModel.worldCitiesApiParams)
+        progressBar.visibility = View.VISIBLE
 
-        citiesViewModel.getCloseUserHomeFeedResult.observe(viewLifecycleOwner, Observer{
+        citiesViewModel.getWorldCitiesResultLiveData.observe(viewLifecycleOwner) {
+            when (it) {
+                is WorldCitiesResultState.Success -> {
+                    progressBar.visibility = View.GONE
+                    Timber.d("SUCCESS!!")
+                    citiesViewModel.saveCloseShowrooms(it.itemList)
+                }
+                is WorldCitiesResultState.Error -> {
+                    progressBar.visibility = View.GONE
+                    Timber.d("ERROR!!")
+                }
+                is WorldCitiesResultState.Loading -> {
 
+                    Timber.d("LOADING!!")
+                }
+                else -> {}
+            }
+        }
+    }
+
+    private fun setUpAdapter() {
+        citiesAdapter = CitiesAdapter()
+        citiesRecyclerView.adapter = citiesAdapter
+
+//        profileViewModel.getUserContactsLiveData().observe(viewLifecycleOwner, Observer {
+//            Timber.d("list are: $it")
+//
+//            if(it.isEmpty()){
+//
+//                if(!profileViewModel.isCheckingContacts){
+//                    emptyStateLayout.visibility = View.VISIBLE
+//                    emptyStateButton.visibility = View.VISIBLE
+//                    emptyStateButton.text = getString(R.string.invite_friends)
+//                    emptyStateMessage.text = String.format(" ${getString(R.string.none_of_your_contact_is_on_myshowroom)}")
+//                }
+//
+//            }else{
+//                emptyStateLayout.visibility = View.GONE
+//                userAdapter.submitList(it)
+//            }
+//
+//            var userText = getString(R.string.contacts_lowercase)
+//            if(it.size == 1) {
+//                userText = getString(R.string.contact_lowercase)
+//            }
+//
+//            contactsToolbar.title = getString(R.string.select_contact)
+//            contactsToolbar.subtitle = "${MyShowroomAppUtils.coolNumberFormat(it.size.toLong())} $userText"
+//        })
+    }
+
+    private fun setupScrollListener() {
+        val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        citiesRecyclerView.layoutManager = layoutManager
+        citiesRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val totalItemCount = layoutManager.itemCount
+                val visibleItemCount = layoutManager.childCount
+                val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+
+                citiesViewModel.cityListScrolled(visibleItemCount, lastVisibleItem, totalItemCount)
+            }
         })
     }
 
-    /*companion object {
-
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            CitiesFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
-    }*/
 }

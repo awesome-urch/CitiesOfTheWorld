@@ -1,9 +1,11 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-android'
     id 'kotlin-kapt'
     id 'androidx.navigation.safeargs.kotlin'
     id 'kotlinx-serialization'
+    id 'kotlin-android-extensions'
 }
 
 
@@ -19,10 +21,15 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
+
         buildConfigField 'String', 'BASE_URL', "\"https://connect-demo.mobile1.io/square1/connect/v1/\""
     }
 
     buildTypes {
+        debug {
+            minifyEnabled false
+        }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -32,6 +39,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    // To enable experimental functionality like @Parcelize
+    androidExtensions {
+        experimental = true
+    }
+
     kotlinOptions {
         jvmTarget = '1.8'
     }
@@ -75,19 +88,23 @@ dependencies {
 
     //moshi
 
-    implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
 
     /*implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
     implementation "com.squareup.moshi:moshi-kotlin:$moshiVersion"
     //annotationProcessor "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"*/
+//    kapt "com.squareup.moshi:moshi-kotlin-codegen:1.12.0"
 
     //Moshi
-    def moshi_version = "1.8.0"
-    kapt("com.squareup.moshi:moshi-kotlin-codegen:$moshi_version")
-    implementation "com.squareup.moshi:moshi:$moshi_version"
-    implementation "com.squareup.moshi:moshi-adapters:$moshi_version"
-    implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
+//    def moshi_version = "1.12.0"
+//    kapt("com.squareup.moshi:moshi-kotlin-codegen:1.12.0")
+//    kapt "com.squareup.moshi:moshi-kotlin-codegen:1.9.2"
+//    implementation "com.squareup.moshi:moshi:1.12.0"
+//    implementation "com.squareup.moshi:moshi-adapters:1.12.0"
+//    implementation "com.squareup.moshi:moshi-kotlin:1.12.0"
+
+
 
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinSerializationVersion"
 

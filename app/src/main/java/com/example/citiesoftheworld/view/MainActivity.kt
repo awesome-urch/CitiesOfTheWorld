@@ -14,9 +14,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        Timber.d("inside onCreate o")
-
-        Log.d("TIMBAA","inside onCreate o")
+        setSupportActionBar(findViewById(R.id.toolbar))
 
 //        val navController: NavController = findNavController(R.id.nav_host_fragment)
 

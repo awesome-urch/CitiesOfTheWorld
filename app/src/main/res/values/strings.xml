@@ -2,4 +2,7 @@
     <string name="app_name">Cities of the World</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="menu_search">Search</string>
+    <string name="name">Name</string>
+    <string name="local_name">Local name</string>
 </resources>
