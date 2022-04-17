@@ -28,6 +28,9 @@ class CitiesViewModel(
     var searchByLiveData: LiveData<MutableList<CityAndCountry>>
     private val filterLiveData = MutableLiveData<String>()
 
+    private val _mapViewVisible = MutableLiveData<Boolean>()
+    val mapViewVisible: LiveData<Boolean> = _mapViewVisible
+
     init {
 
         searchByLiveData = Transformations.switchMap(
@@ -70,6 +73,10 @@ class CitiesViewModel(
         filterLiveData.value = filter
         worldCitiesApiParams.nameFilter = filter
         getWorldCitiesResultMutableLiveData.postValue(worldCitiesApiParams)
+    }
+
+    fun setMapViewVisible(visible: Boolean){
+        _mapViewVisible.value = visible
     }
 
 }

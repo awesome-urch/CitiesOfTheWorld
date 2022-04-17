@@ -1,12 +1,8 @@
 package com.example.citiesoftheworld.view.city
 
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.*
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,8 +22,6 @@ import kotlinx.android.synthetic.main.fragment_cities.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.koin.android.viewmodel.ext.android.viewModel
-import timber.log.Timber
-import java.util.*
 
 
 @FlowPreview
@@ -45,16 +39,6 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
     private lateinit var citiesAdapter: CitiesAdapter
 //    private lateinit var mapFragment: SupportMapFragment
     private lateinit var googleMapObject: GoogleMap
-    /** map to store place names and locations */
-    private val places = mapOf(
-        "BRISBANE" to LatLng(-27.47093, 153.0235),
-        "MELBOURNE" to LatLng(-37.81319, 144.96298),
-        "DARWIN" to LatLng(-12.4634, 130.8456),
-        "SYDNEY" to LatLng(-33.87365, 151.20689),
-        "ADELAIDE" to LatLng(-34.92873, 138.59995),
-        "PERTH" to LatLng(-31.952854, 115.857342),
-        "ALICE_SPRINGS" to LatLng(-24.6980, 133.8807)
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,37 +81,6 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
             )
         }
 
-        if(searchView != null){
-            val searchIcon: ImageView =
-                searchView.findViewById(androidx.appcompat.R.id.search_mag_icon)
-
-            val searchCloseIcon: ImageView =
-                searchView.findViewById(androidx.appcompat.R.id.search_close_btn)
-
-            val searchGoBtn: ImageView =
-                searchView.findViewById(androidx.appcompat.R.id.search_go_btn)
-
-            val searchTextView: TextView =
-                searchView.findViewById(androidx.appcompat.R.id.search_src_text)
-
-            searchCloseIcon.setColorFilter(
-                ContextCompat.getColor(context as MainActivity, R.color.white),
-                PorterDuff.Mode.SRC_IN
-            )
-
-            searchIcon.setColorFilter(
-                ContextCompat.getColor(context as MainActivity, R.color.white),
-                PorterDuff.Mode.SRC_IN
-            )
-
-            searchGoBtn.setColorFilter(
-                ContextCompat.getColor(context as MainActivity, R.color.white),
-                PorterDuff.Mode.SRC_IN
-            )
-
-            searchTextView.setTextColor(ContextCompat.getColor(context as MainActivity, R.color.white))
-        }
-
         menu.findItem(R.id.menu_search).apply {
             setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
             actionView = searchView
@@ -148,7 +101,7 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
                 return false
             }
         })
-        searchView?.setOnClickListener { view -> Timber.d("clicked view")  }
+//        searchView?.setOnClickListener { Timber.d("clicked view")  }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -174,22 +127,26 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
                     progressBar.visibility = View.GONE
                 }
                 is WorldCitiesResultState.Loading -> {
-                    progressBar.visibility = View.GONE
+                    progressBar.visibility = View.VISIBLE
                 }
                 else -> {}
             }
         }
 
-        viewSwitch.setOnClickListener {
-
-            if (viewSwitch.isChecked){
+        citiesViewModel.mapViewVisible.observe(viewLifecycleOwner) {
+            if(it){
                 map.visibility = View.VISIBLE
                 citiesRecyclerView.visibility = View.GONE
-            }
-            else{
+            }else{
                 map.visibility = View.GONE
                 citiesRecyclerView.visibility = View.VISIBLE
             }
+        }
+
+        viewSwitch.setOnClickListener {
+
+            citiesViewModel.setMapViewVisible(viewSwitch.isChecked)
+
         }
 
     }
@@ -227,31 +184,33 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
     }
 
     private fun setUpMapMarkers(cities: MutableList<CityAndCountry>){
-        googleMapObject.clear()
-        for(cityAndCountry in cities){
 
-            cityAndCountry.city.lat?.let { lat ->
-                cityAndCountry.city.lng?.let { lng ->
-                LatLng(lat.toDouble(),
-                    lng.toDouble())
-            } }
-                ?.let { latLng ->
-                    MarkerOptions()
-                        .position(latLng)
-                        .title(cityAndCountry.city.name)
-                        .snippet(cityAndCountry.city.localName)
-                        .infoWindowAnchor(0.5f, 0.5f)
-                        .draggable(false)
-                        .zIndex(0F)
-                }?.let { markerOptions ->
-                    googleMapObject.addMarker(
-                        markerOptions
-                    )
-                    googleMapObject.moveCamera(CameraUpdateFactory.newLatLng(markerOptions.position))
-                }
+        if(this::googleMapObject.isInitialized){
+            googleMapObject.clear()
+            for(cityAndCountry in cities){
+
+                cityAndCountry.city.lat?.let { lat ->
+                    cityAndCountry.city.lng?.let { lng ->
+                        LatLng(lat.toDouble(),
+                            lng.toDouble())
+                    } }
+                    ?.let { latLng ->
+                        MarkerOptions()
+                            .position(latLng)
+                            .title(cityAndCountry.city.name)
+                            .snippet(cityAndCountry.city.localName)
+                            .infoWindowAnchor(0.5f, 0.5f)
+                            .draggable(false)
+                            .zIndex(0F)
+                    }?.let { markerOptions ->
+                        googleMapObject.addMarker(
+                            markerOptions
+                        )
+                        googleMapObject.moveCamera(CameraUpdateFactory.newLatLng(markerOptions.position))
+                    }
+            }
         }
     }
-
 
     override fun onMarkerClick(p0: Marker): Boolean {
         return false
