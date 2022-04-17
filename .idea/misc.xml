@@ -3,10 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../Library/Android/sdk/platforms/android-31/data/res/layout/simple_spinner_item.xml" value="0.1" />
         <entry key="app/src/main/res/font/opensans_font.xml" value="0.165625" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/city_row_item.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_cities.xml" value="0.14442013129102846" />
+        <entry key="app/src/main/res/layout/toolbar_spinner_dropdown_item.xml" value="0.10778985507246377" />
+        <entry key="app/src/main/res/layout/toolbar_spinner_item.xml" value="0.10778985507246377" />
         <entry key="app/src/main/res/menu/world_cities_menu.xml" value="0.1" />
       </map>
     </option>

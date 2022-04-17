@@ -10,4 +10,11 @@
     <string name="map">Map</string>
     <string name="list">List</string>
     <string name="view">View</string>
+    <string name="list_view">List view</string>
+
+    <string-array name="views">
+        <item>List</item>
+        <item>Map</item>
+    </string-array>
+
 </resources>

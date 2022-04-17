@@ -2,6 +2,9 @@ package com.example.citiesoftheworld.view.city
 
 import android.os.Bundle
 import android.view.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -37,27 +40,23 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
     private val citiesViewModel : CitiesViewModel by viewModel()
 
     private lateinit var citiesAdapter: CitiesAdapter
-//    private lateinit var mapFragment: SupportMapFragment
     private lateinit var googleMapObject: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-//        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-//        OnMapAndViewReadyListener(mapFragment, this)
+
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        setHasOptionsMenu(true)
 
         val view = inflater.inflate(R.layout.fragment_cities, container, false)
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
 
-//        mapFragment.getMapAsync(this)
         OnMapAndViewReadyListener(mapFragment, this)
         // Inflate the layout for this fragment
         return view
@@ -88,20 +87,51 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
 
         searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(cityName: String): Boolean {
-//                citiesViewModel.setWorldCitiesApiParams(cityName)
                 citiesViewModel.setFilter(cityName)
-//                citiesViewModel.triggerSearchEvent()
                 return false
             }
 
             override fun onQueryTextChange(newCityName: String): Boolean {
-//                citiesViewModel.setWorldCitiesApiParams(newCityName)
                 citiesViewModel.setFilter(newCityName)
-//                citiesViewModel.triggerSearchEvent()
                 return false
             }
         })
-//        searchView?.setOnClickListener { Timber.d("clicked view")  }
+
+        val item = menu.findItem(R.id.menu_spinner)
+        val spinner = item.actionView as Spinner
+
+        ArrayAdapter.createFromResource(
+            context as MainActivity,
+            R.array.views,
+            R.layout.toolbar_spinner_item
+        ).also { adapter ->
+            // Specify the layout to use when the list of choices appears
+            adapter.setDropDownViewResource(R.layout.toolbar_spinner_dropdown_item)
+            // Apply the adapter to the spinner
+            spinner.adapter = adapter
+        }
+
+        spinner.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>,
+                                        view: View, position: Int, id: Long) {
+
+                    when (position) {
+                        LIST_VIEW_POSITION -> {
+                            citiesViewModel.setMapViewVisible(false)
+                        }
+                        MAP_VIEW_POSITION -> {
+                            citiesViewModel.setMapViewVisible(true)
+                        }
+                    }
+
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // do nothing
+            }
+        }
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -141,12 +171,6 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
                 map.visibility = View.GONE
                 citiesRecyclerView.visibility = View.VISIBLE
             }
-        }
-
-        viewSwitch.setOnClickListener {
-
-            citiesViewModel.setMapViewVisible(viewSwitch.isChecked)
-
         }
 
     }
@@ -251,6 +275,11 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
             moveCamera(CameraUpdateFactory.newLatLng(citiesViewModel.defaultLatLng))
         }
 
-
     }
+
+    companion object {
+        private const val LIST_VIEW_POSITION = 0
+        private const val MAP_VIEW_POSITION = 1
+    }
+
 }

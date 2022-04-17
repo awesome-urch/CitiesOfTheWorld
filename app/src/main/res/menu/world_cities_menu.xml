@@ -14,4 +14,10 @@
         app:showAsAction="collapseActionView|ifRoom"
         />
 
+    <item
+        android:id="@+id/menu_spinner"
+        android:title="@string/list_view"
+        app:actionViewClass="androidx.appcompat.widget.AppCompatSpinner"
+        app:showAsAction="ifRoom" />
+
 </menu>
