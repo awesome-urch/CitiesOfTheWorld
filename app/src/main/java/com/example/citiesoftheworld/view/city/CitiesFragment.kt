@@ -45,7 +45,6 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-
     }
 
     override fun onCreateView(
@@ -181,8 +180,8 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
 
         citiesViewModel.searchByLiveData.observe(viewLifecycleOwner) {
             citiesAdapter.submitList(it)
+            setUpMapMarkers(it)
             if (it.isNotEmpty()) {
-                setUpMapMarkers(it)
                 emptyState.visibility = View.GONE
             } else {
                 emptyState.visibility = View.VISIBLE
@@ -221,7 +220,7 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
                     ?.let { latLng ->
                         MarkerOptions()
                             .position(latLng)
-                            .title(cityAndCountry.city.name)
+                            .title(cityAndCountry.city.name + ", " + cityAndCountry.country?.name)
                             .snippet(cityAndCountry.city.localName)
                             .infoWindowAnchor(0.5f, 0.5f)
                             .draggable(false)
