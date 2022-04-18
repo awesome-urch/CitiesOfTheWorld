@@ -47,7 +47,6 @@ class CitiesViewModel(
     @FlowPreview
     val getWorldCitiesResultLiveData: LiveData<WorldCitiesResultState> = getWorldCitiesResultMutableLiveData.switchMap {
         liveData {
-            Timber.d(" getHomeFeedCloseUserStream")
             val repos = cityRepository.getWorldCitiesStream(it).asLiveData(
                 Dispatchers.Main)
             emitSource(repos)
@@ -56,7 +55,7 @@ class CitiesViewModel(
 
     fun cityListScrolled(visibleItemCount: Int, lastVisibleItemPosition: Int, totalItemCount: Int) {
         if (visibleItemCount + lastVisibleItemPosition + VISIBLE_THRESHOLD >= totalItemCount) {
-            Timber.d("get extra cities")
+            Timber.d("visible item : $visibleItemCount. lastVisible : $lastVisibleItemPosition. totalItem: $totalItemCount")
             viewModelScope.launch {
                 Timber.d("request more")
                 cityRepository.requestMore(worldCitiesApiParams)
@@ -65,8 +64,8 @@ class CitiesViewModel(
         }
     }
 
-    fun saveCloseShowrooms(itemList: List<Items>){
-        cityRepository.saveCloseShowrooms(itemList)
+    fun saveWorldCities(itemList: List<Items>){
+        cityRepository.saveWorldCities(itemList)
     }
 
     fun setFilter(filter: String) {

@@ -150,7 +150,7 @@ class CitiesFragment : Fragment(), GoogleMap.OnMarkerClickListener,
             when (it) {
                 is WorldCitiesResultState.Success -> {
                     progressBar.visibility = View.GONE
-                    citiesViewModel.saveCloseShowrooms(it.itemList)
+                    citiesViewModel.saveWorldCities(it.itemList)
                 }
                 is WorldCitiesResultState.Error -> {
                     progressBar.visibility = View.GONE
