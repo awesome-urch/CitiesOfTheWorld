@@ -26,7 +26,8 @@ class CitiesViewModel(
     var defaultLatLng = LatLng(-27.47093, 153.0235)
 
     var searchByLiveData: LiveData<MutableList<CityAndCountry>>
-    private val filterLiveData = MutableLiveData<String>()
+    private val _filterLiveData = MutableLiveData<String>()
+    val filterLiveData : LiveData<String> = _filterLiveData
 
     private val _mapViewVisible = MutableLiveData<Boolean>()
     val mapViewVisible: LiveData<Boolean> = _mapViewVisible
@@ -34,7 +35,7 @@ class CitiesViewModel(
     init {
 
         searchByLiveData = Transformations.switchMap(
-            filterLiveData
+            _filterLiveData
         ) { name: String? ->
             cityRepository.getCitiesByNameLiveData(
                 name
@@ -69,7 +70,7 @@ class CitiesViewModel(
     }
 
     fun setFilter(filter: String) {
-        filterLiveData.value = filter
+        _filterLiveData.value = filter
         worldCitiesApiParams.nameFilter = filter
         getWorldCitiesResultMutableLiveData.postValue(worldCitiesApiParams)
     }
