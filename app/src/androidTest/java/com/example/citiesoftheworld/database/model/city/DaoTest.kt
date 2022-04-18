@@ -1,6 +1,8 @@
 package com.example.citiesoftheworld.database.model.city
 
 //import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+//import com.example.citiesoftheworld.getOrAwaitValue
+
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
@@ -11,10 +13,10 @@ import com.example.citiesoftheworld.database.model.cityAndCountry.CityAndCountry
 import com.example.citiesoftheworld.database.model.country.Country
 import com.example.citiesoftheworld.database.model.country.CountryDao
 import com.example.citiesoftheworld.getOrAwaitValue
-//import com.example.citiesoftheworld.getOrAwaitValue
-
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
+import org.hamcrest.CoreMatchers.hasItem
+import org.hamcrest.CoreMatchers.not
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.collection.IsIterableContainingInOrder.contains
 import org.junit.After
@@ -22,6 +24,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -51,8 +54,7 @@ class DaoTest {
     }
 
     @Test
-    fun insert() = runBlockingTest {
-//        val shoppingItem = ShoppingItem("name", 1, 1f, "url", id = 1)
+    fun insertCityAndCountry() = runBlockingTest {
 
         val city = City(
                 id = 1L,
@@ -79,9 +81,69 @@ class DaoTest {
         countryDao.insert(country)
         val allCities = cityDao.getCitiesLiveData().getOrAwaitValue()
 
-//        assertThat(allCities).contains(shoppingItem)
-
         assertThat(allCities, contains(cityAndCountry))
+
+    }
+
+    @Test
+    fun getCitiesByName() = runBlockingTest {
+
+        val cityAndCountry1 = CityAndCountry(
+            city = City(
+                id = 1L,
+                name = "City1",
+                localName = "Local name1",
+                lat = "2.0000",
+                lng = "4.0000",
+                countryId = 1L
+            ),
+            country = Country(
+                id = 1L,
+                name = "Country1",
+                code = "0001",
+                continentId = "1"
+            )
+        )
+
+        val cityAndCountry2 = CityAndCountry(
+            city = City(
+                id = 2L,
+                name = "City2",
+                localName = "Local name2",
+                lat = "2.0000",
+                lng = "4.0000",
+                countryId = 2L
+            ),
+            country = Country(
+                id = 2L,
+                name = "Country2",
+                code = "0001",
+                continentId = "1"
+            )
+        )
+
+        cityDao.insert(cityAndCountry1.city)
+        cityAndCountry1.country?.let { countryDao.insert(it) }
+
+        cityDao.insert(cityAndCountry2.city)
+        cityAndCountry2.country?.let { countryDao.insert(it) }
+
+        val allCities = cityDao.getCitiesByNameLiveData("City1").getOrAwaitValue()
+
+//        assertThat(allCities, doesNotContains(cityAndCountry2))
+
+        assertThat(allCities, not(hasItem(cityAndCountry2)))
+
+
+//        val city = allCities[0]
+
+//        assertThat(city, 'is' city)
+
+//        assertThat(allCities, CoreMatchers.everyItem(HasItemMatcher("2")))
+
+//        assertThat(allCities.getCon, equals(cityAndCountry1.city.name))
+
+//        Assert.assertThat(testedList, CoreMatchers.everyItem(HasItemMatcher("2")))
 
     }
 
@@ -109,6 +171,9 @@ class DaoTest {
 
         assertThat(totalPriceSum).isEqualTo(2 * 10f + 4 * 5.5f)
     }*/
+
+
+
 }
 
 

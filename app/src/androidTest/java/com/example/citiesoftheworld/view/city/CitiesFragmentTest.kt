@@ -43,6 +43,8 @@ class CitiesFragmentTest{
 //        ServiceLocator.resetRepository()
     }
 
+
+
     /*@Test
     fun mapViewSelected_DisplayMapView() = runBlockingTest{
         //Given that fragment is launched
