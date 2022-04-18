@@ -79,4 +79,8 @@ class CitiesViewModel(
         _mapViewVisible.value = visible
     }
 
+    fun setMapViewVisiblePostValue(visible: Boolean){
+        _mapViewVisible.postValue(visible)
+    }
+
 }

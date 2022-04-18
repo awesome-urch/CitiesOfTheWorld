@@ -1,28 +1,25 @@
 package com.example.citiesoftheworld.view.city
 
-import android.os.Bundle
-import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.test.espresso.Espresso
+import android.view.View
+import androidx.annotation.IdRes
+import androidx.annotation.StringRes
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions
-import androidx.test.espresso.matcher.ViewMatchers
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.example.citiesoftheworld.R
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.example.citiesoftheworld.database.model.city.CityRepository
 import com.example.citiesoftheworld.database.model.city.CityRepositoryAndroidTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.test.runBlockingTest
-import org.hamcrest.core.IsNot
+import org.hamcrest.Matcher
 import org.junit.After
-import org.junit.Assert.*
 import org.junit.Before
-import org.junit.Test
 import org.junit.runner.RunWith
+
 
 @FlowPreview
 @ExperimentalStdlibApi
@@ -32,11 +29,13 @@ import org.junit.runner.RunWith
 class CitiesFragmentTest{
 
     private lateinit var repository: CityRepository
+    private lateinit var citiesViewModel: CitiesViewModel
 
     @Before
-    fun initRepository() {
+    fun initRepositoryWithViewModel() {
         repository = CityRepositoryAndroidTest()
 //        ServiceLocator.tasksRepository = repository
+        citiesViewModel = CitiesViewModel(repository)
     }
 
     @After
@@ -44,43 +43,34 @@ class CitiesFragmentTest{
 //        ServiceLocator.resetRepository()
     }
 
-//    @OptIn(ExperimentalStdlibApi::class, kotlinx.coroutines.FlowPreview::class)
-    @Test
-    fun activeTaskDetails_DisplayedInUi()  = runBlockingTest{
-        // GIVEN - Add active (incomplete) task to the DB
-//        val activeTask = Task("Active Task", "AndroidX Rocks", false)
-//        repository.saveTask(activeTask)
-
-        // GIVEN - On CitiesFragment screen
+    /*@Test
+    fun mapViewSelected_DisplayMapView() = runBlockingTest{
+        //Given that fragment is launched
         launchFragmentInContainer<CitiesFragment>(Bundle(), R.style.Theme_CitiesOfTheWorld)
+//        onView(withId(R.id.citiesRecyclerView)).perform(click())
 
-    //WHEN
+        //when
+        citiesViewModel.setMapViewVisiblePostValue(false)
+//        onView(withMenuIdOrText(R.id.menu_spinner, R.string.list_view)).perform(click())
 
-    onView(withId(R.id.menu_spinner)).perform(click())
-    onView(withText(R.string.list)).perform(click())
-    onView(withId(R.id.citiesRecyclerView))
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
 
-//    onView(withId(R.id.spinner)).perform(click())
-//    onView(withText("Spinner Item 1")).perform(click())
+        //then
+        onView(withId(R.id.citiesRecyclerView))
+            .check(matches(isDisplayed()))
 
-        // THEN - Task details are displayed on the screen
-        // make sure that the title/description are both shown and correct
-//        onView(withId(R.id.task_detail_title_text))
-//            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-//        onView(withId(R.id.task_detail_title_text))
-//            .check(ViewAssertions.matches(ViewMatchers.withText("Active Task")))
-//        onView(withId(R.id.task_detail_description_text))
-//            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-//        onView(withId(R.id.task_detail_description_text))
-//            .check(ViewAssertions.matches(ViewMatchers.withText("AndroidX Rocks")))
-//
-//        // and make sure the "active" checkbox is shown unchecked
-//        onView(withId(R.id.task_detail_complete_checkbox))
-//            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-//        onView(withId(R.id.task_detail_complete_checkbox))
-//            .check(ViewAssertions.matches(IsNot.not(ViewMatchers.isChecked())))
+    }*/
 
+    fun withMenuIdOrText(@IdRes id: Int, @StringRes menuText: Int): Matcher<View?>? {
+        val matcher: Matcher<View?> = withId(id)
+        return try {
+            onView(matcher).check(matches(isDisplayed()))
+            matcher
+        } catch (NoMatchingViewException: Exception) {
+            openActionBarOverflowOrOptionsMenu(
+                getInstrumentation().targetContext
+            )
+            withText(menuText)
+        }
     }
 
 }

@@ -1,7 +1,7 @@
 package com.example.citiesoftheworld.view.city
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.citiesoftheworld.database.model.city.CityRepositoryTest
+import com.example.citiesoftheworld.database.model.city.CityRepositoryAndroidTest
 import com.example.citiesoftheworld.getOrAwaitValue
 import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers
@@ -15,14 +15,14 @@ class CitiesViewModelTest {
 
     // Subject under test
     private lateinit var citiesViewModel: CitiesViewModel
-    private lateinit var cityRepositoryTest: CityRepositoryTest
+    private lateinit var cityRepositoryTest: CityRepositoryAndroidTest
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
     @Before
     fun setupViewModel() {
-        cityRepositoryTest = CityRepositoryTest()
+        cityRepositoryTest = CityRepositoryAndroidTest()
         citiesViewModel = CitiesViewModel(cityRepositoryTest)
     }
 
