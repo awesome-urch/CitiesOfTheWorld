@@ -12,14 +12,6 @@ import kotlinx.coroutines.flow.Flow
 
 class CityRepositoryTest: CityRepository {
 
-//    var citiesData: LinkedHashMap<Long, CityAndCountry> = LinkedHashMap()
-//
-//    fun testGetCitiesByNameLiveData() {}
-//
-//    fun testSaveWorldCities(cityAndCountry: CityAndCountry) {
-//        citiesData[cityAndCountry.city.id] = cityAndCountry
-//    }
-
     private val cityList = mutableListOf<CityAndCountry>()
 
     private val observableCityList = MutableLiveData(cityList)
